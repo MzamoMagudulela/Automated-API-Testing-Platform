@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database.session import Base, engine, SessionLocal
 from app.models.environment import Environment, EnvironmentVariable
 from app.models.test_collection import TestCollection
+from app.models.collection_folder import CollectionFolder
 from app.models.test_case import TestCase
 from app.models.assertion import TestCaseAssertion
 from app.models.execution import TestExecution, ExecutionAssertionResult, CollectionExecution
@@ -10,6 +11,16 @@ from app.models.settings import AppSetting
 
 def init_database():
     Base.metadata.create_all(bind=engine)
+    with engine.connect() as conn:
+        try:
+            from sqlalchemy import text
+            res = conn.execute(text("PRAGMA table_info(test_cases)"))
+            cols = [row[1] for row in res.fetchall()]
+            if cols and "folder_id" not in cols:
+                conn.execute(text("ALTER TABLE test_cases ADD COLUMN folder_id INTEGER REFERENCES collection_folders(id) ON DELETE SET NULL"))
+                conn.commit()
+        except Exception:
+            pass
     db: Session = SessionLocal()
     try:
         # Check if already seeded

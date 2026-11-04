@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from app.schemas.assertion import AssertionCreate, AssertionOut
 
 class TestCaseBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
     collection_id: Optional[int] = None
+    folder_id: Optional[int] = None
     method: str = Field(default="GET")
     url: str = Field(..., min_length=1, max_length=1000)
     headers: Optional[Dict[str, Any]] = Field(default_factory=dict)
@@ -25,6 +26,7 @@ class TestCaseUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = None
     collection_id: Optional[int] = None
+    folder_id: Optional[int] = None
     method: Optional[str] = None
     url: Optional[str] = None
     headers: Optional[Dict[str, Any]] = None
@@ -38,10 +40,9 @@ class TestCaseUpdate(BaseModel):
     assertions: Optional[List[AssertionCreate]] = None
 
 class TestCaseOut(TestCaseBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_at: datetime
     updated_at: datetime
     assertions: List[AssertionOut] = []
-
-    class Config:
-        from_attributes = True

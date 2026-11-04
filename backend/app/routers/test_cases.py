@@ -18,6 +18,7 @@ router = APIRouter(prefix="/test-cases", tags=["Test Cases"])
 @router.get("", response_model=List[TestCaseOut])
 def get_test_cases(
     collection_id: Optional[int] = None,
+    folder_id: Optional[int] = None,
     method: Optional[str] = None,
     search: Optional[str] = None,
     sort_by: Optional[str] = "created_at",
@@ -28,6 +29,8 @@ def get_test_cases(
 
     if collection_id is not None:
         query = query.filter(TestCase.collection_id == collection_id)
+    if folder_id is not None:
+        query = query.filter(TestCase.folder_id == folder_id)
     if method:
         query = query.filter(TestCase.method == method.upper())
     if search:
@@ -48,6 +51,7 @@ def get_test_cases(
 def create_test_case(tc_in: TestCaseCreate, db: Session = Depends(get_db)):
     test_case = TestCase(
         collection_id=tc_in.collection_id,
+        folder_id=tc_in.folder_id,
         name=tc_in.name,
         description=tc_in.description,
         method=tc_in.method.upper(),
@@ -99,6 +103,8 @@ def update_test_case(id: int, tc_in: TestCaseUpdate, db: Session = Depends(get_d
         test_case.description = tc_in.description
     if tc_in.collection_id is not None:
         test_case.collection_id = tc_in.collection_id
+    if tc_in.folder_id is not None:
+        test_case.folder_id = tc_in.folder_id if tc_in.folder_id > 0 else None
     if tc_in.method is not None:
         test_case.method = tc_in.method.upper()
     if tc_in.url is not None:
@@ -144,6 +150,46 @@ def delete_test_case(id: int, db: Session = Depends(get_db)):
     db.delete(test_case)
     db.commit()
     return None
+
+@router.post("/{id}/duplicate", response_model=TestCaseOut, status_code=status.HTTP_201_CREATED)
+def duplicate_test_case(id: int, db: Session = Depends(get_db)):
+    orig = db.query(TestCase).filter(TestCase.id == id).first()
+    if not orig:
+        raise HTTPException(status_code=404, detail="Test case not found.")
+
+    cloned = TestCase(
+        collection_id=orig.collection_id,
+        folder_id=orig.folder_id,
+        name=f"{orig.name} (Copy)",
+        description=orig.description,
+        method=orig.method,
+        url=orig.url,
+        headers=dict(orig.headers or {}),
+        query_params=dict(orig.query_params or {}),
+        body=orig.body,
+        auth_type=orig.auth_type,
+        auth_config=dict(orig.auth_config or {}),
+        expected_status_code=orig.expected_status_code,
+        max_response_time_ms=orig.max_response_time_ms,
+        order_index=(orig.order_index or 0) + 1,
+    )
+    db.add(cloned)
+    db.commit()
+    db.refresh(cloned)
+
+    for a in orig.assertions:
+        cloned_a = TestCaseAssertion(
+            test_case_id=cloned.id,
+            assertion_type=a.assertion_type,
+            target=a.target,
+            operator=a.operator,
+            expected_value=a.expected_value,
+        )
+        db.add(cloned_a)
+    db.commit()
+    db.refresh(cloned)
+
+    return cloned
 
 @router.post("/{id}/execute", response_model=ExecuteResponse)
 async def execute_single_test_case(
