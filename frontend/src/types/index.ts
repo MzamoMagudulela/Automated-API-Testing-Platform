@@ -32,6 +32,7 @@ export interface TestCaseAssertion {
 export interface TestCase {
   id: number;
   collection_id?: number | null;
+  folder_id?: number | null;
   name: string;
   description?: string;
   method: HttpMethod;
@@ -49,6 +50,18 @@ export interface TestCase {
   assertions: TestCaseAssertion[];
 }
 
+export interface CollectionFolder {
+  id: number;
+  collection_id: number;
+  name: string;
+  description?: string | null;
+  order_index: number;
+  test_cases_count?: number;
+  test_cases?: TestCase[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TestCollection {
   id: number;
   name: string;
@@ -56,6 +69,8 @@ export interface TestCollection {
   created_at: string;
   updated_at: string;
   test_cases_count?: number;
+  folders_count?: number;
+  folders?: CollectionFolder[];
   test_cases?: TestCase[];
 }
 

@@ -4,6 +4,7 @@ import {
   Environment,
   TestCase,
   TestCollection,
+  CollectionFolder,
   TestExecution,
   CollectionExecution,
   ExecuteRequestPayload,
@@ -60,7 +61,7 @@ export const api = {
   },
 
   // Test Cases
-  getTestCases: async (params?: { collection_id?: number; method?: string; search?: string }): Promise<TestCase[]> => {
+  getTestCases: async (params?: { collection_id?: number; folder_id?: number; method?: string; search?: string }): Promise<TestCase[]> => {
     const { data } = await client.get<TestCase[]>('/test-cases', { params });
     return data;
   },
@@ -78,6 +79,10 @@ export const api = {
   },
   deleteTestCase: async (id: number): Promise<void> => {
     await client.delete(`/test-cases/${id}`);
+  },
+  duplicateTestCase: async (id: number): Promise<TestCase> => {
+    const { data } = await client.post<TestCase>(`/test-cases/${id}/duplicate`);
+    return data;
   },
   executeTestCase: async (id: number, environmentId?: number | null): Promise<ExecuteResponsePayload> => {
     const url = environmentId ? `/test-cases/${id}/execute?environment_id=${environmentId}` : `/test-cases/${id}/execute`;
@@ -112,6 +117,41 @@ export const api = {
   },
   getCollectionRuns: async (id: number): Promise<CollectionExecution[]> => {
     const { data } = await client.get<CollectionExecution[]>(`/collections/${id}/runs`);
+    return data;
+  },
+
+  // Folders inside Collections
+  getCollectionFolders: async (collectionId: number): Promise<CollectionFolder[]> => {
+    const { data } = await client.get<CollectionFolder[]>(`/collections/${collectionId}/folders`);
+    return data;
+  },
+  createCollectionFolder: async (
+    collectionId: number,
+    folderData: { name: string; description?: string; order_index?: number }
+  ): Promise<CollectionFolder> => {
+    const { data } = await client.post<CollectionFolder>(`/collections/${collectionId}/folders`, folderData);
+    return data;
+  },
+  getCollectionFolder: async (collectionId: number, folderId: number): Promise<CollectionFolder> => {
+    const { data } = await client.get<CollectionFolder>(`/collections/${collectionId}/folders/${folderId}`);
+    return data;
+  },
+  updateCollectionFolder: async (
+    collectionId: number,
+    folderId: number,
+    folderData: { name?: string; description?: string; order_index?: number }
+  ): Promise<CollectionFolder> => {
+    const { data } = await client.put<CollectionFolder>(`/collections/${collectionId}/folders/${folderId}`, folderData);
+    return data;
+  },
+  deleteCollectionFolder: async (collectionId: number, folderId: number): Promise<void> => {
+    await client.delete(`/collections/${collectionId}/folders/${folderId}`);
+  },
+  runFolder: async (collectionId: number, folderId: number, environmentId?: number | null): Promise<CollectionExecution> => {
+    const url = environmentId
+      ? `/collections/${collectionId}/folders/${folderId}/run?environment_id=${environmentId}`
+      : `/collections/${collectionId}/folders/${folderId}/run`;
+    const { data } = await client.post<CollectionExecution>(url);
     return data;
   },
 
@@ -150,7 +190,6 @@ export const api = {
   clearHistory: async (): Promise<void> => {
     await client.delete('/history');
   },
-
 
   // Performance Analytics
   getPerformanceAnalytics: async (params?: {

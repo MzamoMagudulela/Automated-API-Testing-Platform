@@ -13,4 +13,5 @@ class TestCollection(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     test_cases = relationship("TestCase", back_populates="collection", cascade="all, delete-orphan", order_by="TestCase.order_index")
+    folders = relationship("CollectionFolder", back_populates="collection", cascade="all, delete-orphan", order_by="CollectionFolder.order_index")
     runs = relationship("CollectionExecution", back_populates="collection", cascade="all, delete-orphan")

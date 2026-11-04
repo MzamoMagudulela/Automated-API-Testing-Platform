@@ -8,6 +8,7 @@ class TestCase(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     collection_id = Column(Integer, ForeignKey("test_collections.id", ondelete="SET NULL"), nullable=True, index=True)
+    folder_id = Column(Integer, ForeignKey("collection_folders.id", ondelete="SET NULL"), nullable=True, index=True)
     name = Column(String(200), nullable=False, index=True)
     description = Column(Text, nullable=True)
     method = Column(String(10), nullable=False, default="GET", index=True)
@@ -24,5 +25,6 @@ class TestCase(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     collection = relationship("TestCollection", back_populates="test_cases")
+    folder = relationship("CollectionFolder", back_populates="test_cases")
     assertions = relationship("TestCaseAssertion", back_populates="test_case", cascade="all, delete-orphan")
     executions = relationship("TestExecution", back_populates="test_case", cascade="all, delete-orphan")
