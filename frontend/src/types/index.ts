@@ -198,3 +198,58 @@ export interface ReportSummary {
   total_failed_assertions: number;
   executions: TestExecution[];
 }
+
+
+export interface RequestSummary {
+  id: number;
+  name?: string | null;
+  endpoint_url: string;
+  http_method: string;
+  status_code?: number | null;
+  response_time_ms: number;
+  is_success: boolean;
+  executed_at: string;
+}
+
+export interface MethodPerformanceStat {
+  method: string;
+  count: number;
+  avg_response_time_ms: number;
+  min_response_time_ms: number;
+  max_response_time_ms: number;
+  success_count: number;
+  failure_count: number;
+  success_rate: number;
+}
+
+export interface PerformanceTrendPoint {
+  date: string;
+  avg_response_time_ms: number;
+  min_response_time_ms: number;
+  max_response_time_ms: number;
+  total_requests: number;
+  passed_requests: number;
+  failed_requests: number;
+}
+
+export interface PerformanceInsight {
+  category: 'success' | 'warning' | 'danger' | 'info';
+  title: string;
+  message: string;
+  metric?: string | null;
+}
+
+export interface PerformanceAnalyticsResponse {
+  total_tests: number;
+  successful_tests: number;
+  failed_tests: number;
+  success_rate: number;
+  avg_response_time_ms: number;
+  min_response_time_ms: number;
+  max_response_time_ms: number;
+  fastest_request?: RequestSummary | null;
+  slowest_request?: RequestSummary | null;
+  method_performance: MethodPerformanceStat[];
+  response_time_trends: PerformanceTrendPoint[];
+  insights: PerformanceInsight[];
+}

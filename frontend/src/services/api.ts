@@ -11,6 +11,7 @@ import {
   ReportSummary,
   HistoryPaginationResponse,
   HistorySummaryStats,
+  PerformanceAnalyticsResponse,
 } from '../types';
 
 const client = axios.create({
@@ -148,6 +149,25 @@ export const api = {
   },
   clearHistory: async (): Promise<void> => {
     await client.delete('/history');
+  },
+
+
+  // Performance Analytics
+  getPerformanceAnalytics: async (params?: {
+    start_date?: string;
+    end_date?: string;
+    method?: string;
+  }): Promise<PerformanceAnalyticsResponse> => {
+    const cleanParams: Record<string, string> = {};
+    if (params) {
+      if (params.start_date) cleanParams.start_date = params.start_date;
+      if (params.end_date) cleanParams.end_date = params.end_date;
+      if (params.method) cleanParams.method = params.method;
+    }
+    const { data } = await client.get<PerformanceAnalyticsResponse>('/analytics/performance', {
+      params: cleanParams,
+    });
+    return data;
   },
 
   // Reports

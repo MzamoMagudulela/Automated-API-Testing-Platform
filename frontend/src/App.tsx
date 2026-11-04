@@ -7,6 +7,7 @@ import { TestCasesPage } from './pages/TestCasesPage';
 import { CollectionsPage } from './pages/CollectionsPage';
 import { EnvironmentsPage } from './pages/EnvironmentsPage';
 import { HistoryPage } from './pages/HistoryPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -21,6 +22,7 @@ export const App: React.FC = () => {
           <Route path="collections" element={<CollectionsPage />} />
           <Route path="environments" element={<EnvironmentsPage />} />
           <Route path="history" element={<HistoryPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
