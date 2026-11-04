@@ -7,6 +7,7 @@ import {
   FolderTree,
   Server,
   History,
+  Gauge,
   FileBarChart2,
   Settings,
   Activity,
@@ -26,6 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     { to: '/collections', label: 'Collections', icon: FolderTree },
     { to: '/environments', label: 'Environments', icon: Server },
     { to: '/history', label: 'Execution History', icon: History },
+    { to: '/analytics', label: 'Performance Analytics', icon: Gauge },
     { to: '/reports', label: 'Reports & Export', icon: FileBarChart2 },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];

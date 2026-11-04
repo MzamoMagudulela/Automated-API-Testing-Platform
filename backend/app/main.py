@@ -10,6 +10,7 @@ from app.routers import (
     test_collections,
     environments,
     history,
+    analytics,
     reports,
     settings as settings_router,
     mock_api,
@@ -43,6 +44,7 @@ app.include_router(test_cases.router, prefix=settings.API_V1_STR)
 app.include_router(test_collections.router, prefix=settings.API_V1_STR)
 app.include_router(environments.router, prefix=settings.API_V1_STR)
 app.include_router(history.router, prefix=settings.API_V1_STR)
+app.include_router(analytics.router, prefix=settings.API_V1_STR)
 app.include_router(reports.router, prefix=settings.API_V1_STR)
 app.include_router(settings_router.router, prefix=settings.API_V1_STR)
 app.include_router(mock_api.router, prefix=settings.API_V1_STR)
