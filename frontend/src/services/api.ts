@@ -9,6 +9,8 @@ import {
   ExecuteRequestPayload,
   ExecuteResponsePayload,
   ReportSummary,
+  HistoryPaginationResponse,
+  HistorySummaryStats,
 } from '../types';
 
 const client = axios.create({
@@ -113,8 +115,28 @@ export const api = {
   },
 
   // History
-  getHistory: async (params?: { method?: string; status?: string; search?: string; limit?: number; offset?: number }): Promise<TestExecution[]> => {
-    const { data } = await client.get<TestExecution[]>('/history', { params });
+  getHistory: async (params?: {
+    method?: string;
+    status?: string;
+    search?: string;
+    page?: number;
+    page_size?: number;
+    start_date?: string;
+    end_date?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<HistoryPaginationResponse> => {
+    const { data } = await client.get<HistoryPaginationResponse>('/history', { params });
+    return data;
+  },
+  getHistorySummary: async (params?: {
+    method?: string;
+    status?: string;
+    search?: string;
+    start_date?: string;
+    end_date?: string;
+  }): Promise<HistorySummaryStats> => {
+    const { data } = await client.get<HistorySummaryStats>('/history/summary', { params });
     return data;
   },
   getHistoryDetail: async (id: number): Promise<TestExecution> => {
@@ -134,11 +156,23 @@ export const api = {
     return data;
   },
   getReportCsvUrl: (params?: { collection_id?: number; status?: string; method?: string }): string => {
-    const query = new URLSearchParams(params as any).toString();
+    const cleanParams: Record<string, string> = {};
+    if (params) {
+      if (params.collection_id) cleanParams.collection_id = String(params.collection_id);
+      if (params.status) cleanParams.status = params.status;
+      if (params.method) cleanParams.method = params.method;
+    }
+    const query = new URLSearchParams(cleanParams).toString();
     return `/api/v1/reports/export/csv${query ? '?' + query : ''}`;
   },
   getReportPdfUrl: (params?: { collection_id?: number; status?: string; method?: string }): string => {
-    const query = new URLSearchParams(params as any).toString();
+    const cleanParams: Record<string, string> = {};
+    if (params) {
+      if (params.collection_id) cleanParams.collection_id = String(params.collection_id);
+      if (params.status) cleanParams.status = params.status;
+      if (params.method) cleanParams.method = params.method;
+    }
+    const query = new URLSearchParams(cleanParams).toString();
     return `/api/v1/reports/export/pdf${query ? '?' + query : ''}`;
   },
 

@@ -71,22 +71,33 @@ def delete_mock_user(id: int):
         "message": f"User {id} deleted successfully",
     }
 
-@router.api_route("/echo", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-async def echo_request(request: Request):
+async def _process_echo(request: Request):
     body_bytes = await request.body()
     body_str = body_bytes.decode("utf-8", errors="replace") if body_bytes else None
-    
-    headers_dict = dict(request.headers)
-    params_dict = dict(request.query_params)
-    
     return {
         "status": "success",
         "method": request.method,
         "url": str(request.url),
-        "headers": headers_dict,
-        "query_params": params_dict,
+        "headers": dict(request.headers),
+        "query_params": dict(request.query_params),
         "body": body_str,
     }
+
+@router.get("/echo")
+async def echo_get(request: Request):
+    return await _process_echo(request)
+
+@router.post("/echo")
+async def echo_post(request: Request):
+    return await _process_echo(request)
+
+@router.put("/echo")
+async def echo_put(request: Request):
+    return await _process_echo(request)
+
+@router.delete("/echo")
+async def echo_delete(request: Request):
+    return await _process_echo(request)
 
 @router.get("/delay/{seconds}")
 async def delay_response(seconds: float):

@@ -170,6 +170,24 @@ export interface ExecuteResponsePayload {
   resolved_headers: Record<string, string>;
 }
 
+export interface HistoryPaginationResponse {
+  items: TestExecution[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface HistorySummaryStats {
+  total_executions: number;
+  passed_count: number;
+  failed_count: number;
+  success_rate: number;
+  avg_response_time_ms: number;
+  fastest_response_time_ms?: number | null;
+  slowest_response_time_ms?: number | null;
+}
+
 export interface ReportSummary {
   generated_at: string;
   total_tests: number;
